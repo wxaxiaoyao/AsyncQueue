@@ -3,6 +3,11 @@
 
 NodeJs 异步(async)队列, 提供一种顺序执行异步任务的机制. 如 web 服务某一个请求的某段代码需要互斥执行时, 就需要将此部分互斥执行代码进行排队, 下文也将互斥执行代码统称为任务 task.
 
+### 安装
+```
+npm install AsyncQueue --save
+```
+
 ### 特性
 
 - 支持 ES6 promise, async/wait
