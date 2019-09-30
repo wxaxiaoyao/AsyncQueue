@@ -1,19 +1,26 @@
 {
-  "name": "async-queue",
+  "name": "AsyncQueue",
   "version": "1.0.0",
-  "description": "desc",
+  "description": "nodejs async queue",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "mocha --no-timeout"
   },
   "repository": {
     "type": "git",
-    "url": "https://"
+    "url": "https://github.com/wxaxiaoyao/async-queue"
   },
   "keywords": [
     "async",
+	"lock",
     "queue"
   ],
   "author": "wxaxiaoyao",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "mocha": "^6.2.1"
+  }
 }
