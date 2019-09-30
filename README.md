@@ -5,7 +5,7 @@ NodeJs 异步(async)队列, 提供一种顺序执行异步任务的机制. 如 w
 
 ### 安装
 ```
-npm install AsyncQueue --save
+npm install async-queue --save
 ```
 
 ### 特性
@@ -19,7 +19,7 @@ npm install AsyncQueue --save
 ### 使用
 
 ```
-const AsyncQueue = require("AsyncQueue");
+const AsyncQueue = require("@wxaxiaoyao/async-queue");
 
 const ret = await AsyncQueue.exec("queue name", function() {
 	console.log("task code");
