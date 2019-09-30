@@ -1,0 +1,19 @@
+{
+  "name": "async-queue",
+  "version": "1.0.0",
+  "description": "desc",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://"
+  },
+  "keywords": [
+    "async",
+    "queue"
+  ],
+  "author": "wxaxiaoyao",
+  "license": "ISC"
+}
