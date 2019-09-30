@@ -1,4 +1,6 @@
-
+const _fs = require("fs");
+const _path = require("path");
+const base64 = require('js-base64').Base64;
 const _ = require("lodash");
 
 const promiseTry = (fn) => {
@@ -9,17 +11,61 @@ const promiseTry = (fn) => {
 	}
 }
 
+const mkdir = (path) => {
+	if (!path || _fs.existsSync(path)) return;
+
+	const dir = _path.dirname(path);
+	if (dir == path) throw new Error("create dir failed");
+	
+	try {
+		_fs.mkdirSync(path);  // 创建目录
+	} catch(e) {
+		if (e.code !== "ENOENT") throw e;
+		mkdir(dir);           // 目录不存在 创建子目录
+		mkdir(path);          // 重新创建父目录
+	}
+}
+
 const QUEUES_VAR = Symbol("QUEUES_VAR");
 const QUEUE_FN = Symbol("QUEUE_FN");
 const DONE_FN = Symbol("DONE_FN");
 const EXEC_FN = Symbol("EXEC_FN");
 const TASK_FN = Symbol("TASK_FN");
+const LOCK_FN = Symbol("LOCK_FN");
+const UNLOCK_FN = Symbol("UNLOCK_FN");
 
 class AsyncQueue {
 	constructor(opts = {}) {
 		this[QUEUES_VAR] = {};
 		this.maxSize = opts.maxSize || 0;        // 不做限制
 		this.timeout = opts.timeout || 0;        // 默认超时时间
+		this.enableFileLock = false;             // 是否启用文件锁
+		this.fileLockDir = "";                   // 文件锁目录
+	}
+
+	// 使用目录锁
+	async [LOCK_FN](dirname, timeout = 0) {
+		const startTime = _.now();
+		return new Promise((resolve, reject) => {
+			const _lock = () => {
+				try {
+					_fs.mkdirSync(dirname, {recursive: true});
+					console.log("-----------------");
+					return resolve(true);
+				} catch(e) {
+					console.log(e);
+					if (timeout && (_.now() - startTime) > timeout) return resolve(false);
+					console.log("仓库被锁定, 等待解锁");
+					setTimeout(_lock, 100);
+				} 
+			}
+			return _lock();
+		});
+	}
+
+	[UNLOCK_FN](dirname) {
+		_fs.rmdirSync(dirname, {recursive: true});
+		//_fs.rmdirSync(dirname);
 	}
 
 	// 获取队列
@@ -62,16 +108,26 @@ class AsyncQueue {
 	}
 
 	// 执行任务
-	[EXEC_FN](task) {
+	async [EXEC_FN](task) {
 		// 设置当前正在执行的任务
 		task.queue.task = task;
+
+		const queue = task.queue;
+		const key = task.key;
+		const fileLockDir = this.fileLockDir || "";
+		const base64Key = base64.encode(task.key);
+		const dirname = _path.join(fileLockDir, "lock~" + base64Key);
+		const ok = await this[LOCK_FN](dirname, task.timeout || queue.timeout || this.timeout);
+		if (!ok) return this[DONE_FN](task, undefined, new Error(`${key} lock failed`));
 
 		// 执行任务
 		promiseTry(() => {
 			return task.fn();
 		}).then(data => {
+			this[UNLOCK_FN](dirname);
 			this[DONE_FN](task, data, undefined);
 		}).catch(err => {
+			this[UNLOCK_FN](dirname);
 			this[DONE_FN](task, undefined, err);
 		});
 	}
@@ -158,6 +214,12 @@ class AsyncQueue {
 	size(key) {
 		if (key == undefined) return _.keys(this[QUEUES_VAR]).length;
 		return (this[QUEUES_VAR][key] || []).length;
+	}
+
+	setFileLock(enable, dir) {
+		this.enableFileLock = enable;
+		this.fileLockDir = dir || "";
+		mkdir(dir);
 	}
 }
 

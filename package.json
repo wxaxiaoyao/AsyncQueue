@@ -12,12 +12,13 @@
   },
   "keywords": [
     "async",
-	"lock",
+    "lock",
     "queue"
   ],
   "author": "wxaxiaoyao",
   "license": "ISC",
   "dependencies": {
+    "js-base64": "^2.5.1",
     "lodash": "^4.17.15"
   },
   "devDependencies": {

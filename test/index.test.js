@@ -77,5 +77,11 @@ describe("async queue", async () => {
 			}, 5000);
 		});
 	});
+
+	it ("003 文件锁", async() => {
+		AsyncQueue.setFileLock(true, "test/lock/lock");
+		
+		AsyncQueue.exec("", () => console.log("file lock test"));
+	});
 });
 
