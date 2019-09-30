@@ -5,7 +5,7 @@ NodeJs 异步(async)队列, 提供一种顺序执行异步任务的机制. 如 w
 
 ### 安装
 ```
-npm install async-queue --save
+npm install @wxaxiaoyao/async-queue --save
 ```
 
 ### 特性
@@ -19,6 +19,7 @@ npm install async-queue --save
 ### 使用
 
 ```
+// 基本示例
 const AsyncQueue = require("@wxaxiaoyao/async-queue");
 
 const ret = await AsyncQueue.exec("queue name", function() {
@@ -27,90 +28,33 @@ const ret = await AsyncQueue.exec("queue name", function() {
 	timeout:0,     // 超时时间, 不超时
 	priority: 10,  // 任务优先级
 }).catch(err => console.log(err));
-```
 
-### 单元测试
-> `npm test`  运行单元测试
-
-```
-const _ =  require("lodash");
-const AsyncQueue = require("../index.js");
-
-const sleep = async (ms = 0) => {
+// 并发示例
+let total = 0;
+const countTask = async () => {
+	let count = total;
 	return new Promise((resolve, reject) => {
-		return setTimeout(resolve(true), ms);
+		setTimeout(() => {
+			total = count + 1;
+			console.log("total: ", total);
+			return resolve(total);
+		}, _.random(500, 2000));
 	})
 }
 
-describe("async queue", async () => {
-	it("001 优先级测试", async () => {
-		const p1 = async () => {
-			return await new Promise((resolve, reject) => {
-				setTimeout(() => {
-					console.log("wait 1s, p1");
-					return resolve("p1");
-				}, 1000);
-			});
-		}
-
-		const p2 = async () => {
-			return await new Promise((resolve, reject) => {
-				setTimeout(() => {
-					console.log("wait 2s, p2");
-					return resolve("p2");
-				}, 2000);
-			});
-		}
-
-		const p3 = async () => {
-			return await new Promise((resolve, reject) => {
-				setTimeout(() => {
-					console.log("wait 3s, p3");
-					return resolve("p3");
-				}, 3000);
-			});
-		}
-
-		AsyncQueue.exec("", p1, {priority: 10});
-		AsyncQueue.exec("", () => {console.log("wait 0s, p0")}, {priority: 12});
-		AsyncQueue.exec("", p2, {priority: 11});
-		AsyncQueue.exec("", p3, {priority: 9});
-		await sleep(6000);
-		
-	});
-
-	it ("002 计数测试", async () => {
-		let total = 0;
-		const countTask = async () => {
-			let count = total;
-			return new Promise((resolve, reject) => {
-				setTimeout(() => {
-					total = count + 1;
-					console.log("total: ", total);
-					return resolve(total);
-				}, _.random(500, 2000));
-			})
-		}
-
-		setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
-		setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
-		setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
-		setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
-		setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
-		setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
-		setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
-		setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
-
-		// 等待
-		await new Promise((resolve, reject) => {
-			setTimeout(async () => {
-				await AsyncQueue.exec("", countTask);
-				resolve(true);
-			}, 5000);
-		});
-	});
-});
+setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
+setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
+setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
+setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
+setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
+setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
+setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
+setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
 ```
+
+### 单元测试
+> npm test 运行单元测试
+
 ### API
 
 #### AsyncQueue.exec(key, fn, opt)
@@ -129,3 +73,6 @@ describe("async queue", async () => {
 #### AsyncQueue.setMaxSize(key, maxSize)
 - key string|undefined 队列名称, 具有唯一性, 当为 undefined 时设置所有队列默认值, 即 AsyncQueue.maxSize = maxSize;
 - maxSize number 队列最大任务数 0 不做限制
+
+
+
