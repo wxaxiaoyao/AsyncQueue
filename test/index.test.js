@@ -5,9 +5,9 @@ const assert = require("assert");
 const AsyncQueue = require("../index.js");
 
 const sleep = async (ms = 0) => {
-	return new Promise((resolve, reject) => {
+	return await new Promise((resolve, reject) => {
 		return setTimeout(resolve(true), ms);
-	})
+	});
 }
 
 describe("async queue", async () => {
@@ -43,7 +43,7 @@ describe("async queue", async () => {
 		AsyncQueue.exec("", () => {console.log("wait 0s, p0")}, {priority: 12});
 		AsyncQueue.exec("", p2, {priority: 11});
 		AsyncQueue.exec("", p3, {priority: 9});
-		await sleep(6000);
+		//await sleep(60000);
 		
 	});
 
@@ -79,9 +79,25 @@ describe("async queue", async () => {
 	});
 
 	it ("003 文件锁", async() => {
-		AsyncQueue.setFileLock(true, "test/lock/lock");
-		
-		AsyncQueue.exec("", () => console.log("file lock test"));
+		const inst1 = AsyncQueue.create();
+		const inst2 = AsyncQueue.create();
+		inst1.setFileLock(true, "test/lock");
+		inst2.setFileLock(true, "test/lock");
+
+		inst1.exec("", async () => {
+			await new Promise((resolve, reject) => setTimeout(resolve, 3000));
+			console.log("inst1 exec finished");
+		});
+
+		inst1.exec("", async () => {
+			await new Promise((resolve, reject) => setTimeout(resolve, 1000));
+			console.log("inst2 exec finished");
+		}, {timeout:  2000}).catch(e => console.log(e));
+
+		inst2.exec("", async () => {
+			await new Promise((resolve, reject) => setTimeout(resolve, 1000));
+			console.log("inst2 exec finished");
+		});
 	});
 });
 

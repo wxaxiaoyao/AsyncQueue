@@ -15,6 +15,7 @@ npm install @wxaxiaoyao/async-queue --save
 - 支持任务优先级, 数值越大, 优先级越低. 默认值 1000
 - 支持指定任务(task)超时, 默认不超时.
 - 支持指定队列(queue)长度限制, 默认无限制, 执行完的任务会自动从队列中移除.
+- 支持文件锁, 多进程同步控制
 
 ### 使用
 
@@ -74,5 +75,6 @@ setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
 - key string|undefined 队列名称, 具有唯一性, 当为 undefined 时设置所有队列默认值, 即 AsyncQueue.maxSize = maxSize;
 - maxSize number 队列最大任务数 0 不做限制
 
-
-
+#### AsyncQueue.setFileLock(enable, dir)
+- enable boolean 是否开启文件锁
+- dir string 文件锁目录

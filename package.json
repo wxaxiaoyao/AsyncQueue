@@ -1,6 +1,6 @@
 {
   "name": "@wxaxiaoyao/async-queue",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "NodeJs 异步(async)队列, 提供一种顺序执行异步任务的机制.",
   "main": "index.js",
   "scripts": {
