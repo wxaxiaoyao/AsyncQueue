@@ -3,10 +3,11 @@ const _ =  require("lodash");
 const assert = require("assert");
 
 const AsyncQueue = require("../index.js");
+const util = require("../lib/util.js");
 
 const sleep = async (ms = 0) => {
 	return await new Promise((resolve, reject) => {
-		return setTimeout(resolve(true), ms);
+		return setTimeout(() => resolve(true), ms);
 	});
 }
 
@@ -79,6 +80,9 @@ describe("async queue", async () => {
 	});
 
 	it ("003 文件锁", async() => {
+		const ok = util.rmdir("test/lock");
+		assert(ok);
+
 		const inst1 = AsyncQueue.create();
 		const inst2 = AsyncQueue.create();
 		inst1.setFileLock(true, "test/lock");
