@@ -58,7 +58,16 @@ setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
 
 ### API
 
+#### AsyncQueue.create({maxSize, timeout, enableFileLock, fileLockPath})
+> 创建异步队列示例, AsyncQueue 本身也是一个示例.
+
+- maxSize 队列大小, 默认0
+- timeout 任务超时时间, 默认0
+- enableFileLock 是否开始文件锁 默认 false
+- fileLockPath 文件锁目录 默认 ""
+
 #### AsyncQueue.exec(key, fn, opt)
+> 执行异步任务
 
 - key string 队列名称, 具有唯一性
 - fn funtion 任务函数, 必须为函数
@@ -68,13 +77,22 @@ setTimeout(() => AsyncQueue.exec("", countTask), _.random(100, 1500));
   - opt.maxSize 当前任务队列最大任务数   队列最大任务数 opt.maxSize || queue.maxSize || AsyncQueue.maxSize
 
 #### AsyncQueue.setTimeout(key, timeout)
+> 设置指定队列任务超时时间
+
 - key string|undefined 队列名称, 具有唯一性, 当为 undefined 时设置所有队列默认值, 即 AsyncQueue.timeout = timeout;
 - timeout number 毫秒, 0 不超时
 
 #### AsyncQueue.setMaxSize(key, maxSize)
+> 设置指定队列大小
+
 - key string|undefined 队列名称, 具有唯一性, 当为 undefined 时设置所有队列默认值, 即 AsyncQueue.maxSize = maxSize;
 - maxSize number 队列最大任务数 0 不做限制
 
-#### AsyncQueue.setFileLock(enable, dir)
+#### AsyncQueue.setFileLock(enable, path)
+> 使能文件锁
+
 - enable boolean 是否开启文件锁
-- dir string 文件锁目录
+- path string 文件锁目录
+
+
+
