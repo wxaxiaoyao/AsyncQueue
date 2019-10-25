@@ -103,5 +103,19 @@ describe("async queue", async () => {
 			console.log("inst2 exec finished");
 		});
 	});
+
+	it ("004 上锁超时", async() => {
+		const ok = util.rmdir("test/lock");
+		assert(ok);
+
+		util.mkdir("test/lock/dGVzdA==");
+		const inst = AsyncQueue.create({lockwait: 1000, enableFileLock: true, fileLockPath: "test/lock"});
+		
+		inst.exec("test", async () => {
+			await new Promise((resolve, reject) => setTimeout(resolve, 2000));
+			console.log("inst1 exec finished");
+		});
+
+	});
 });
 
