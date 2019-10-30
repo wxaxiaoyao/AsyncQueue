@@ -1,5 +1,6 @@
 
 const _ =  require("lodash");
+const _fs = require("fs");
 const assert = require("assert");
 
 const AsyncQueue = require("../index.js");
@@ -80,9 +81,6 @@ describe("async queue", async () => {
 	});
 
 	it ("003 文件锁", async() => {
-		const ok = util.rmdir("test/lock");
-		assert(ok);
-
 		const inst1 = AsyncQueue.create();
 		const inst2 = AsyncQueue.create();
 		inst1.setFileLock(true, "test/lock");
@@ -105,16 +103,12 @@ describe("async queue", async () => {
 	});
 
 	it ("004 上锁超时", async() => {
-		const ok = util.rmdir("test/lock");
-		assert(ok);
-
-		util.mkdir("test/lock/dGVzdA==");
 		const inst = AsyncQueue.create({lockwait: 1000, enableFileLock: true, fileLockPath: "test/lock"});
-		
+		util.mkdir("test/lock/lock/dGVzdA==.lock");
 		inst.exec("test", async () => {
 			await new Promise((resolve, reject) => setTimeout(resolve, 2000));
 			console.log("inst1 exec finished");
-		});
+		}).catch(e => console.log(e));
 
 	});
 });
